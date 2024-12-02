@@ -19,16 +19,32 @@ class MainWrapperState extends State<MainWrapper> {
   ];
 
   Future<bool> _systemBackButtonPressed() async {
-    if (_navigatorKeys[_selectedIndex].currentState?.canPop() == true) {
-      _navigatorKeys[_selectedIndex]
-          .currentState
-          ?.pop(_navigatorKeys[_selectedIndex].currentContext);
-      return false;
-    } else {
-      SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
-      return true; // Indicate that the back action is handled
-    }
+  if (_navigatorKeys[_selectedIndex].currentState?.canPop() == true) {
+    _navigatorKeys[_selectedIndex]
+        .currentState
+        ?.pop(_navigatorKeys[_selectedIndex].currentContext);
+    return false;
+  } else {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Exit App'),
+        content: Text('Do you really want to exit the app?'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop'),
+            child: Text('Yes'),
+          ),
+        ],
+      ),
+    ) ?? false;
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
